@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)file:///Users/steve_neal/Downloads/step_test_report_15.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Step Test — VO2Master + Intervals.icu + Llume</title>
+<style>
+  :root {
+    --teal-deep: #0b4d3e;
+    --teal:      #14815f;
+    --green:     #6aa84f;
+    --yellow:    #f1c40f;
+    --ink:       #1a1a1a;
+    --muted:     #6b6b6b;
+    --card:      #ffffff;
+    --surface:   #f6f5f0;
+    --border:    rgba(0,0,0,0.08);
+    --zone:      rgba(182,217,76,0.14);
+    --vt1:       #2a5db0;
+    --vt2:       #c94c3c;
+    --llume:     #c68128;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--surface); color: var(--ink); line-height: 1.5; }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  header { border-bottom: 4px solid var(--teal-deep);
+    padding-bottom: 14px; margin-bottom: 22px;
+    display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; }
+  h1 { font-size: 22px; margin: 0; color: var(--teal-deep); font-weight: 600; }
+  .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .brand { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  h2 { font-size: 16px; color: var(--teal-deep); margin: 0 0 10px; font-weight: 600; }
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 18px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 10px; font-size: 12px; color: var(--muted); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .sw { width: 16px; height: 3px; border-radius: 1px; }
+  .chart-wrap { position: relative; width: 100%; touch-action: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .grid-wide { display: grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap: 16px; }
+  @media (max-width: 700px) { .grid-wide { grid-template-columns: 1fr; } }
+  .cell { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .cell h3 { font-size: 13px; color: var(--teal-deep); margin: 0 0 8px; font-weight: 600; letter-spacing: 0.2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { padding: 6px 7px; text-align: right; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+  th { font-weight: 600; color: var(--teal-deep); font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;
+        background: #f3f2ed; border-top: 1px solid var(--border); position: sticky; top: 0; }
+  td:first-child, th:first-child { text-align: center; color: var(--muted); font-weight: 500; }
+  tr:hover td { background: #fbfbf6; }
+  .footnote { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+  .pill { display: inline-block; padding: 2px 8px; background: var(--teal-deep); color: white;
+          border-radius: 10px; font-size: 11px; font-weight: 500; letter-spacing: 0.3px; }
+  .consensus { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .con-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; position: relative; }
+  .con-card .label { font-size: 12px; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; }
+  .con-card.vt1 { border-left: 4px solid var(--vt1); border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  .con-card.vt2 { border-left: 4px solid var(--vt2); border-top-left-radius: 0; border-bottom-left-radius: 0; }
+  .con-card .big { font-size: 28px; font-weight: 600; margin: 2px 0; font-variant-numeric: tabular-nums; }
+  .con-card .ci  { font-size: 13px; color: var(--muted); }
+  @media (max-width: 700px) { .consensus { grid-template-columns: 1fr; } }
+  .picker-row {
+    display: flex; gap: 10px; flex-wrap: wrap; padding: 10px 14px;
+    background: #edf1e4; border: 1px solid #d4decb;
+    border-radius: 10px; margin-bottom: 14px; font-size: 13px; align-items: center;
+  }
+  .picker-row .label { color: #3b5c1e; font-weight: 500; }
+  .picker-row button {
+    padding: 6px 12px; border: 1px solid #d4decb; background: white; color: var(--ink);
+    border-radius: 6px; font-size: 12.5px; cursor: pointer; font-family: inherit;
+  }
+  .picker-row button.active {
+    background: var(--teal-deep); color: white; border-color: var(--teal-deep);
+  }
+  .picker-row button:hover:not(.active) { background: #f3f2ed; }
+  .toolbar {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    padding: 10px 14px; background: #edf1e4; border: 1px solid #d4decb;
+    border-radius: 10px; margin-bottom: 14px; font-size: 13px;
+  }
+  .toolbar .info { color: #3b5c1e; flex: 1; min-width: 200px; }
+  .toolbar button {
+    padding: 6px 12px; border: 1px solid var(--teal-deep); background: white;
+    color: var(--teal-deep); border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+  }
+  .toolbar button:hover { background: var(--teal-deep); color: white; }
+  .edit-badge {
+    display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px;
+    background: var(--yellow); color: #5a4400; margin-left: 6px; letter-spacing: 0.3px; vertical-align: middle;
+  }
+  .warn-box {
+    background: #fff8e1; border: 1px solid #f0c349; border-left: 4px solid #f0c349;
+    padding: 8px 12px; margin: 10px 0; font-size: 13px; border-radius: 0 6px 6px 0;
+    color: #664500;
+  }
+  @media print { body { padding: 0; background: #fff; } .section, .cell, .con-card { border-color: #ccc; } .toolbar, .picker-row { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>1-minute step test — 17 April 2026</h1>
+    <div class="sub">Thresholds with selectable data source (mask vs Llume) and SmO2 slope method</div>
+  </div>
+  <div class="brand">Steve Neal Performance</div>
+</header>
+
+<div class="picker-row">
+  <span class="label">Ventilation source for Rf / Ve / Tv:</span>
+  <button data-source="mask" id="srcMask">VO2Master mask</button>
+  <button data-source="llume" id="srcLlume" class="active">Llume chest strap</button>
+  <span id="srcDesc" style="margin-left:10px;color:#3b5c1e;font-size:12px;">chest strap, Ve/Tv saturate at high loads</span>
+</div>
+
+<div id="llumeWarn" class="warn-box" style="display: block;">
+  <b>Heads up:</b> Llume Ve saturates around 42 L/min (mask peaks at 106 L/min on this test) and Tv is similarly capped. Shape tracks the mask, magnitudes don't. The Ve V-slope breakpoint shifts noticeably between sources because of this.
+</div>
+
+<div class="picker-row">
+  <span class="label">SmO2 slope method:</span>
+  <button data-method="m1" id="btnM1">start 10s vs end 10s</button>
+  <button data-method="m2" id="btnM2" class="active">last 90 s linreg</button>
+  <button data-method="m3" id="btnM3">whole-step linreg</button>
+  <span id="methodDesc" style="margin-left:10px;color:#3b5c1e;font-size:12px;">captures the settled phase on long steps</span>
+</div>
+
+<div class="toolbar">
+  <div class="info">Drag any VT1 or VT2 line to adjust. Changes save automatically to this browser.</div>
+  <span id="editStatus" style="font-size:12px;color:#3b5c1e;">5 manual edits saved</span>
+  <button id="btnReset">Reset to auto</button>
+  <button id="btnCopy">Copy values</button>
+</div>
+
+<div class="consensus">
+  <div class="con-card vt1">
+    <div class="label">Consensus VT1 (first threshold)</div>
+    <div class="big" id="vt1Big">167 W</div>
+    <div class="ci" id="vt1CI">±8.4 W  (range 150–174 W)</div>
+  </div>
+  <div class="con-card vt2">
+    <div class="label">Consensus VT2 (second threshold)</div>
+    <div class="big" id="vt2Big">193 W</div>
+    <div class="ci" id="vt2CI">±16.1 W  (range 170–209 W)</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Test timeline — power, HR, VO2</h2>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--ink);"></span>Power (W)</span>
+    <span><span class="sw" style="background:#c94c3c;"></span>HR (bpm)</span>
+    <span><span class="sw" style="background:var(--teal);"></span>VO2 (mL/kg/min)</span>
+    <span style="background:var(--zone);padding:2px 8px;border-radius:3px;">Step zones</span>
+  </div>
+  <div class="chart-wrap" style="height:320px;"><canvas id="tlChart" width="2316" height="640" style="display: block; box-sizing: border-box; height: 320px; width: 1158px;"></canvas></div>
+</div>
+
+<div class="section">
+  <h2>Threshold summary — where each marker lands</h2>
+  <div class="chart-wrap" style="height:280px;"><canvas id="forestChart" width="2316" height="560" style="display: block; box-sizing: border-box; height: 280px; width: 1158px; cursor: default;"></canvas></div>
+  <div style="overflow-x:auto;margin-top:14px;">
+    <table>
+      <thead><tr><th>Method</th><th>VT1 (W)</th><th>VT2 (W)</th><th style="text-align:left;">Rule</th></tr></thead>
+      <tbody id="thresholdBody"><tr><td style="text-align:left;font-weight:500;">VE/VO2</td><td>170</td><td>209<span class="edit-badge">edited</span></td>
+            <td style="text-align:left;color:var(--muted);font-size:11.5px;">minimum of U-shape; steepest post-min rise</td></tr><tr><td style="text-align:left;font-weight:500;">Ve (V-slope)</td><td>150<span class="edit-badge">edited</span></td><td>170</td>
+            <td style="text-align:left;color:var(--muted);font-size:11.5px;">piecewise linear breakpoints  (Llume chest strap)</td></tr><tr><td style="text-align:left;font-weight:500;">Rf</td><td>170<span class="edit-badge">edited</span></td><td>200<span class="edit-badge">edited</span></td>
+            <td style="text-align:left;color:var(--muted);font-size:11.5px;">piecewise linear breakpoints  (Llume chest strap)</td></tr><tr><td style="text-align:left;font-weight:500;">SmO2 slope</td><td>171</td><td>179</td>
+            <td style="text-align:left;color:var(--muted);font-size:11.5px;">slope &gt; +0.005 %/s; slope peak  (last 90 s linreg)</td></tr><tr><td style="text-align:left;font-weight:500;">Oxy/de-oxy</td><td>174</td><td>209<span class="edit-badge">edited</span></td>
+            <td style="text-align:left;color:var(--muted);font-size:11.5px;">O2Hb/HHb crossover; steepest divergence</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Individual markers — drag the VT1 / VT2 lines</h2>
+  <div class="grid">
+    <div class="cell"><h3>VE/VO2 <span style="font-size:11px;color:var(--muted);font-weight:400;">(mask only)</span></h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_vevo2" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px; cursor: default;"></canvas></div>
+      <div class="footnote">VT1 = minimum of U-shape. VT2 = steepest post-minimum rise.</div></div>
+    <div class="cell"><h3>Ve — V-slope <span id="ve_src" style="font-size:11px;color:var(--muted);font-weight:400;">(Llume chest strap)</span></h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_ve" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px; cursor: default;"></canvas></div>
+      <div class="footnote">Piecewise linear breakpoints.</div></div>
+    <div class="cell"><h3>Rf — respiration rate <span id="rf_src" style="font-size:11px;color:var(--muted);font-weight:400;">(Llume chest strap)</span></h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_rf" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px; cursor: default;"></canvas></div>
+      <div class="footnote">Piecewise linear.</div></div>
+    <div class="cell"><h3>SmO2 slope (<span id="slopeMethodLabel">last 90 s linreg</span>)</h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_smo2slope" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px; cursor: default;"></canvas></div>
+      <div class="footnote">VT1 = slope crosses +0.005 %/s. VT2 = slope peak.</div></div>
+    <div class="cell"><h3>Oxy &amp; de-oxy hemoglobin</h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_oxy" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px; cursor: default;"></canvas></div>
+      <div class="footnote">VT1 = O2Hb/HHb crossover. VT2 = steepest divergence.</div></div>
+    <div class="cell"><h3>Per-step values <span id="mini_src" style="font-size:11px;color:var(--muted);font-weight:400;">(Llume chest strap)</span></h3>
+      <div style="max-height:220px;overflow-y:auto;">
+        <table>
+          <thead><tr><th>St</th><th>W</th><th>VE/VO2</th><th>Ve</th><th>Rf</th><th>Tv</th><th>slope</th><th>O2Hb</th><th>HHb</th></tr></thead>
+          <tbody id="miniBody"><tr><td>1</td><td><b>99</b></td>
+      <td>20.2</td><td>21.6</td><td>14.3</td><td>1.52</td>
+      <td>-0.046</td>
+      <td>6.28</td><td>5.83</td></tr><tr><td>2</td><td><b>119</b></td>
+      <td>19.3</td><td>28.3</td><td>21.9</td><td>1.33</td>
+      <td>-0.040</td>
+      <td>6.44</td><td>5.65</td></tr><tr><td>3</td><td><b>140</b></td>
+      <td>18.3</td><td>30</td><td>20</td><td>1.51</td>
+      <td>-0.031</td>
+      <td>6.21</td><td>5.83</td></tr><tr><td>4</td><td><b>150</b></td>
+      <td>18.3</td><td>30.7</td><td>18</td><td>1.72</td>
+      <td>-0.023</td>
+      <td>6.35</td><td>5.68</td></tr><tr><td>5</td><td><b>158</b></td>
+      <td>18.8</td><td>32.1</td><td>19.4</td><td>1.66</td>
+      <td>-0.036</td>
+      <td>6.32</td><td>5.71</td></tr><tr><td>6</td><td><b>170</b></td>
+      <td>18.1</td><td>31.9</td><td>18.9</td><td>1.69</td>
+      <td>0.028</td>
+      <td>6.10</td><td>5.94</td></tr><tr><td>7</td><td><b>179</b></td>
+      <td>18.6</td><td>33.6</td><td>20.8</td><td>1.62</td>
+      <td>0.017</td>
+      <td>5.92</td><td>6.12</td></tr><tr><td>8</td><td><b>188</b></td>
+      <td>18.6</td><td>35.9</td><td>24.2</td><td>1.48</td>
+      <td>0.042</td>
+      <td>5.72</td><td>6.35</td></tr><tr><td>9</td><td><b>200</b></td>
+      <td>19.7</td><td>37.9</td><td>24.4</td><td>1.56</td>
+      <td>0.024</td>
+      <td>5.52</td><td>6.54</td></tr><tr><td>10</td><td><b>209</b></td>
+      <td>19.6</td><td>39.3</td><td>26</td><td>1.51</td>
+      <td>-0.015</td>
+      <td>5.42</td><td>6.64</td></tr><tr><td>11</td><td><b>217</b></td>
+      <td>20.8</td><td>40.7</td><td>27.9</td><td>1.46</td>
+      <td>0.013</td>
+      <td>5.22</td><td>6.86</td></tr></tbody>
+        </table>
+      </div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Ventilation data comparison — mask vs Llume per step</h2>
+  <div class="grid">
+    <div class="cell"><h3>Rf — mask vs Llume</h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_cmp_rf" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px;"></canvas></div>
+      <div class="footnote">Dual axes auto-fit each sensor's own range. Shapes should overlap if both are reading the same breathing pattern.</div></div>
+    <div class="cell"><h3>Ve — mask vs Llume</h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_cmp_ve" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px;"></canvas></div>
+      <div class="footnote">Each axis scaled to its own range so you can compare shape despite the magnitude gap (mask 44–94 vs Llume 22–41 L/min). Divergence in shape shows where the Llume model behaves differently from true airflow.</div></div>
+    <div class="cell"><h3>Tv — mask vs Llume</h3>
+      <div class="chart-wrap" style="height:220px;"><canvas id="c_cmp_tv" width="685" height="440" style="display: block; box-sizing: border-box; height: 220px; width: 342px;"></canvas></div>
+      <div class="footnote">Shape comparison: both sensors track tidal volume across a similar narrow range (mask 3.05–3.42, Llume 1.33–1.72). Shape match indicates consistent per-step changes.</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Mask vs Llume column charts against power</h2>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--teal);"></span>Mask (VO2Master)</span>
+    <span><span class="sw" style="background:var(--llume);"></span>Llume chest strap</span>
+    <span style="color:var(--muted);">One column per step, across all 11 steps of the test</span>
+  </div>
+  <div class="grid-wide">
+    <div class="cell"><h3>Rf — respiration rate</h3>
+      <div class="chart-wrap" style="height:340px;"><canvas id="colRf" width="1074" height="680" style="display: block; box-sizing: border-box; height: 340px; width: 537px;"></canvas></div>
+      <div class="footnote">Bars are similar heights at every step — both sensors agree on breathing frequency across the whole power range.</div></div>
+    <div class="cell"><h3>Ve — ventilation</h3>
+      <div class="chart-wrap" style="height:340px;"><canvas id="colVe" width="1074" height="680" style="display: block; box-sizing: border-box; height: 340px; width: 537px;"></canvas></div>
+      <div class="footnote">Dual axes: mask on left (44–94 L/min), Llume on right (22–41 L/min). Llume ramps smoothly but flattens at high loads — that's the saturation ceiling.</div></div>
+    <div class="cell"><h3>Tv — tidal volume</h3>
+      <div class="chart-wrap" style="height:340px;"><canvas id="colTv" width="1074" height="680" style="display: block; box-sizing: border-box; height: 340px; width: 537px;"></canvas></div>
+      <div class="footnote">Dual axes: mask ~3&nbsp;L, Llume ~1.5–1.8&nbsp;L. Different magnitudes, shapes compared side by side.</div></div>
+    <div class="cell"><h3>Tv / 3.2 — as % of reference</h3>
+      <div class="chart-wrap" style="height:340px;"><canvas id="colTvPct" width="1074" height="680" style="display: block; box-sizing: border-box; height: 340px; width: 537px;"></canvas></div>
+      <div class="footnote">Mask tidal volume expressed as a percentage of 3.2&nbsp;L. Values near 100% mean he’s breathing close to the reference depth. Red band marks the 75–85% shallow-breathing zone.</div></div>
+  </div>
+</div>
+
+</div>
+
+<script src="./StepCompare_files/chart.umd.js"></script>
+<script>
+const DATA = {"timeline":{"t":[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,210,215,220,225,230,235,240,245,250,255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560,565,570,575,580,585,590,595,600,605,610,615,620,625,630,635,640,645,650,655,660,665,670,675,680,685,690,695,700,705,710,715,720,725,730,735,740,745,750,755,760,765,770,775,780,785,790,795,800,805,810,815,820,825,830,835,840,845,850,855,860,865,870,875,880,885,890,895,900,905,910,915,920,925,930,935,940,945,950,955,960,965,970,975,980,985,990,995,1000,1005,1010,1015,1020,1025,1030,1035,1040,1045,1050,1055,1060,1065,1070,1075,1080,1085,1090,1095,1100,1105,1110,1115,1120,1125,1130,1135,1140,1145,1150,1155,1160,1165,1170,1175,1180,1185,1190,1195,1200,1205,1210,1215,1220,1225,1230,1235,1240,1245,1250,1255,1260],"power":[0.0,42.0,55.0,50.0,59.0,48.0,48.0,107.0,109.0,111.0,128.0,104.0,101.0,103.0,90.0,103.0,112.0,100.0,87.0,88.0,98.0,102.0,104.0,94.0,97.0,94.0,96.0,102.0,104.0,106.0,85.0,94.0,99.0,99.0,101.0,92.0,102.0,113.0,108.0,106.0,98.0,94.0,119.0,93.0,107.0,101.0,101.0,92.0,102.0,91.0,100.0,102.0,107.0,90.0,94.0,112.0,95.0,86.0,103.0,113.0,95.0,92.0,98.0,102.0,93.0,101.0,100.0,111.0,114.0,118.0,131.0,118.0,119.0,107.0,119.0,104.0,113.0,129.0,118.0,114.0,122.0,111.0,123.0,105.0,124.0,121.0,123.0,135.0,120.0,123.0,121.0,91.0,116.0,138.0,116.0,109.0,124.0,116.0,122.0,122.0,102.0,132.0,113.0,126.0,116.0,129.0,119.0,123.0,127.0,139.0,112.0,113.0,99.0,117.0,125.0,141.0,128.0,138.0,172.0,139.0,131.0,146.0,136.0,150.0,147.0,137.0,131.0,127.0,136.0,134.0,136.0,135.0,143.0,143.0,138.0,131.0,142.0,170.0,139.0,132.0,138.0,139.0,112.0,148.0,145.0,136.0,135.0,153.0,149.0,138.0,118.0,153.0,149.0,150.0,136.0,158.0,138.0,149.0,151.0,153.0,158.0,153.0,146.0,171.0,153.0,154.0,160.0,160.0,148.0,163.0,172.0,165.0,156.0,150.0,151.0,178.0,183.0,185.0,173.0,149.0,183.0,172.0,180.0,173.0,206.0,175.0,172.0,176.0,187.0,189.0,182.0,177.0,180.0,194.0,170.0,181.0,172.0,179.0,206.0,165.0,208.0,179.0,166.0,190.0,202.0,201.0,203.0,197.0,182.0,193.0,207.0,203.0,219.0,188.0,190.0,194.0,200.0,220.0,198.0,200.0,183.0,239.0,194.0,220.0,203.0,210.0,221.0,264.0,210.0,193.0,196.0,202.0,228.0,208.0,258.0,272.0,188.0,212.0,231.0,208.0,203.0,236.0,209.0,223.0,225.0,236.0,216.0,0.0,0.0,0.0,0.0,0.0,0.0],"hr":[72.0,73.0,76.0,79.0,80.0,78.0,79.0,79.0,83.0,85.0,87.0,88.0,89.0,89.0,89.0,91.0,93.0,94.0,95.0,95.0,95.0,95.0,94.0,93.0,93.0,93.0,93.0,94.0,96.0,96.0,95.0,95.0,95.0,95.0,97.0,98.0,96.0,95.0,94.0,95.0,95.0,94.0,93.0,96.0,96.0,95.0,97.0,95.0,96.0,99.0,99.0,99.0,98.0,98.0,100.0,100.0,99.0,98.0,98.0,98.0,99.0,101.0,101.0,100.0,98.0,98.0,99.0,99.0,100.0,103.0,103.0,103.0,104.0,104.0,102.0,103.0,105.0,107.0,107.0,108.0,109.0,110.0,110.0,109.0,111.0,109.0,106.0,106.0,107.0,106.0,106.0,106.0,108.0,108.0,110.0,112.0,112.0,114.0,115.0,115.0,114.0,115.0,114.0,115.0,115.0,114.0,113.0,114.0,113.0,114.0,115.0,113.0,112.0,111.0,110.0,108.0,109.0,111.0,113.0,114.0,115.0,114.0,112.0,113.0,114.0,115.0,116.0,117.0,119.0,119.0,120.0,120.0,118.0,117.0,117.0,116.0,116.0,116.0,117.0,117.0,118.0,119.0,121.0,122.0,123.0,124.0,125.0,124.0,121.0,119.0,118.0,119.0,120.0,120.0,119.0,119.0,119.0,119.0,120.0,121.0,121.0,122.0,123.0,124.0,126.0,128.0,128.0,128.0,128.0,128.0,129.0,129.0,128.0,128.0,128.0,128.0,128.0,128.0,129.0,130.0,130.0,130.0,131.0,133.0,133.0,132.0,131.0,130.0,129.0,129.0,130.0,132.0,133.0,134.0,135.0,135.0,136.0,136.0,137.0,138.0,139.0,136.0,139.0,139.0,139.0,137.0,136.0,135.0,135.0,137.0,137.0,137.0,139.0,139.0,140.0,139.0,138.0,137.0,137.0,137.0,137.0,138.0,140.0,141.0,141.0,141.0,143.0,144.0,145.0,146.0,147.0,147.0,147.0,147.0,148.0,149.0,149.0,149.0,150.0,150.0,150.0,150.0,151.0,151.0,150.0,150.0,151.0,151.0,151.0,150.0,146.0,143.0,140.0],"smo2":[49.9,49.2,50.7,60.2,60.5,57.4,54.5,52.4,49.6,48.7,43.3,42.8,44.8,46.4,47.8,43.8,39.9,46.9,42.9,47.8,44.9,48.5,44.8,51.6,45.9,45.0,47.9,46.7,44.3,45.3,49.9,46.3,48.1,49.7,45.0,45.0,50.9,49.1,45.2,49.2,48.2,45.3,48.2,49.4,46.4,48.0,49.7,50.5,47.1,48.1,48.0,51.7,53.0,52.1,47.5,50.9,54.9,50.9,50.0,53.7,52.5,51.4,51.6,50.1,51.6,49.0,49.6,47.9,50.4,51.5,48.7,51.2,50.3,49.9,47.7,46.8,45.8,46.6,47.1,45.0,47.4,49.4,48.7,50.3,49.2,48.5,49.6,48.5,49.3,48.7,49.1,49.8,52.0,52.6,49.8,48.8,48.3,51.4,52.7,52.9,48.9,53.5,54.1,50.1,49.5,50.0,54.7,54.2,52.8,51.5,55.2,56.3,53.9,50.5,49.5,55.0,54.7,48.5,50.0,53.6,49.6,50.9,45.4,45.9,49.7,50.7,53.2,50.7,51.6,54.2,46.3,48.9,49.4,49.7,51.9,50.3,51.7,50.1,48.2,46.6,48.4,51.1,53.5,55.2,46.9,54.4,54.8,48.6,53.0,54.9,50.0,55.5,46.7,54.8,51.1,56.6,54.7,52.6,55.6,49.1,55.3,50.1,56.4,51.6,49.2,55.7,46.2,55.1,53.3,49.8,55.5,56.5,51.9,55.1,53.9,55.9,49.5,55.1,53.4,53.3,46.7,53.7,48.0,45.2,49.2,52.3,48.2,52.4,46.6,47.4,50.3,50.5,50.9,45.7,52.6,46.1,53.1,49.3,53.9,50.0,49.3,51.0,48.2,48.9,44.9,49.0,49.5,49.2,43.3,41.8,48.1,49.2,48.8,49.7,48.2,46.2,48.1,49.7,47.8,47.7,45.1,48.4,46.3,39.6,44.1,48.3,45.0,47.8,48.5,42.6,46.9,44.4,46.0,47.4,46.8,47.6,39.7,39.4,42.4,42.9,44.2,44.1,45.8,45.9,41.8,44.7,44.8,46.3,50.9,57.2,65.4,69.7,69.1],"vo2":[null,null,null,0.0,7.22,8.38,9.22,9.38,13.93,13.93,9.0,10.65,15.28,16.04,14.06,16.62,13.83,14.83,20.63,14.47,20.03,17.78,16.05,20.65,18.11,16.7,23.96,19.02,19.83,22.56,22.6,20.9,17.93,19.34,17.66,18.59,21.48,21.56,17.49,18.55,19.45,20.94,24.38,17.81,19.46,17.73,22.4,20.51,23.63,24.44,21.76,19.53,21.11,22.46,23.64,22.24,18.64,22.78,20.35,22.4,22.98,21.51,19.06,18.94,28.78,20.32,19.95,18.07,19.69,30.05,21.88,21.5,20.51,22.65,23.76,22.62,24.97,24.97,26.84,26.44,25.88,23.55,23.97,25.15,23.7,26.03,25.23,25.51,24.52,25.61,24.79,25.23,28.03,27.83,26.25,26.72,29.16,27.98,29.5,26.85,26.86,26.35,26.51,28.77,29.27,24.1,26.0,28.02,26.13,23.8,29.07,27.09,26.0,28.74,26.08,28.41,28.33,28.49,29.08,27.78,27.09,30.32,30.05,27.22,28.98,29.83,36.23,33.41,28.96,30.07,25.49,32.46,33.75,31.51,28.3,32.68,30.26,30.68,29.4,31.76,33.93,32.54,30.87,33.12,32.16,33.02,36.18,30.59,36.05,32.83,33.34,32.09,35.66,32.27,31.03,31.5,30.86,32.45,34.84,30.53,32.74,31.9,34.92,30.43,31.22,35.17,35.17,38.52,35.16,34.76,33.39,32.87,35.67,31.99,30.81,36.6,34.06,31.39,38.65,37.42,31.31,37.46,29.56,35.72,39.61,35.61,36.4,40.07,33.34,35.02,40.08,34.77,38.19,41.11,32.85,36.48,34.02,40.95,35.99,36.44,44.91,38.55,36.3,38.98,36.98,41.53,38.14,31.07,40.52,40.89,43.27,37.66,39.45,42.14,41.29,43.15,43.56,42.18,36.8,40.43,37.75,41.42,41.09,44.32,39.07,40.25,42.73,44.26,49.35,45.99,43.72,46.52,43.93,43.79,45.73,42.45,45.45,45.0,46.56,42.46,42.93,42.69,49.16,46.34,45.9,44.02,44.4,43.96,45.93,41.71,49.19,39.6,39.64]},"steps":[{"step":1,"t_start":40,"t_end":330,"duration_s":290,"t_mid":185.0,"power_W":99.0,"HR_bpm":99.0,"Ve_mask":44.3,"Ve_llume":21.6,"Rf_mask":14.5,"Rf_llume":14.3,"Tv_mask":3.05,"Tv_llume":1.52,"VO2_mlkgmin":21.7,"VeVO2":20.2,"SmO2_start_pct":48.1,"SmO2_end_pct":52.5,"SmO2_slope_m1_startend":-0.0151,"SmO2_slope_m2_last90s":-0.0459,"SmO2_slope_m3_overall":-0.0253,"O2Hb":6.28,"HHb":5.83},{"step":2,"t_start":340,"t_end":570,"duration_s":230,"t_mid":455.0,"power_W":119.0,"HR_bpm":112.0,"Ve_mask":52.4,"Ve_llume":28.3,"Rf_mask":15.7,"Rf_llume":21.9,"Tv_mask":3.34,"Tv_llume":1.33,"VO2_mlkgmin":26.9,"VeVO2":19.3,"SmO2_start_pct":52.6,"SmO2_end_pct":53.1,"SmO2_slope_m1_startend":-0.0021,"SmO2_slope_m2_last90s":-0.0399,"SmO2_slope_m3_overall":-0.0169,"O2Hb":6.44,"HHb":5.65},{"step":3,"t_start":580,"t_end":750,"duration_s":170,"t_mid":665.0,"power_W":140.0,"HR_bpm":122.0,"Ve_mask":59.0,"Ve_llume":30.0,"Rf_mask":18.4,"Rf_llume":20.0,"Tv_mask":3.22,"Tv_llume":1.51,"VO2_mlkgmin":32.0,"VeVO2":18.3,"SmO2_start_pct":51.7,"SmO2_end_pct":52.0,"SmO2_slope_m1_startend":-0.0016,"SmO2_slope_m2_last90s":-0.0314,"SmO2_slope_m3_overall":-0.0129,"O2Hb":6.21,"HHb":5.83},{"step":4,"t_start":760,"t_end":820,"duration_s":60,"t_mid":790.0,"power_W":150.0,"HR_bpm":123.0,"Ve_mask":60.7,"Ve_llume":30.7,"Rf_mask":18.2,"Rf_llume":18.0,"Tv_mask":3.34,"Tv_llume":1.72,"VO2_mlkgmin":32.9,"VeVO2":18.3,"SmO2_start_pct":51.8,"SmO2_end_pct":53.6,"SmO2_slope_m1_startend":-0.0287,"SmO2_slope_m2_last90s":-0.0227,"SmO2_slope_m3_overall":-0.0227,"O2Hb":6.35,"HHb":5.68},{"step":5,"t_start":820,"t_end":870,"duration_s":50,"t_mid":845.0,"power_W":158.0,"HR_bpm":128.0,"Ve_mask":63.3,"Ve_llume":32.1,"Rf_mask":19.2,"Rf_llume":19.4,"Tv_mask":3.29,"Tv_llume":1.66,"VO2_mlkgmin":33.4,"VeVO2":18.8,"SmO2_start_pct":52.1,"SmO2_end_pct":52.4,"SmO2_slope_m1_startend":-0.0056,"SmO2_slope_m2_last90s":-0.0359,"SmO2_slope_m3_overall":-0.0359,"O2Hb":6.32,"HHb":5.71},{"step":6,"t_start":870,"t_end":930,"duration_s":60,"t_mid":900.0,"power_W":170.0,"HR_bpm":132.0,"Ve_mask":64.7,"Ve_llume":31.9,"Rf_mask":18.9,"Rf_llume":18.9,"Tv_mask":3.42,"Tv_llume":1.69,"VO2_mlkgmin":35.5,"VeVO2":18.1,"SmO2_start_pct":52.0,"SmO2_end_pct":51.1,"SmO2_slope_m1_startend":0.0137,"SmO2_slope_m2_last90s":0.0279,"SmO2_slope_m3_overall":0.0279,"O2Hb":6.1,"HHb":5.94},{"step":7,"t_start":930,"t_end":990,"duration_s":60,"t_mid":960.0,"power_W":179.0,"HR_bpm":136.0,"Ve_mask":70.5,"Ve_llume":33.6,"Rf_mask":21.5,"Rf_llume":20.8,"Tv_mask":3.27,"Tv_llume":1.62,"VO2_mlkgmin":37.5,"VeVO2":18.6,"SmO2_start_pct":50.7,"SmO2_end_pct":48.8,"SmO2_slope_m1_startend":0.0322,"SmO2_slope_m2_last90s":0.0165,"SmO2_slope_m3_overall":0.0165,"O2Hb":5.92,"HHb":6.12},{"step":8,"t_start":990,"t_end":1050,"duration_s":60,"t_mid":1020.0,"power_W":188.0,"HR_bpm":136.0,"Ve_mask":75.9,"Ve_llume":35.9,"Rf_mask":24.7,"Rf_llume":24.2,"Tv_mask":3.16,"Tv_llume":1.48,"VO2_mlkgmin":40.4,"VeVO2":18.6,"SmO2_start_pct":50.2,"SmO2_end_pct":47.4,"SmO2_slope_m1_startend":0.0482,"SmO2_slope_m2_last90s":0.042,"SmO2_slope_m3_overall":0.042,"O2Hb":5.72,"HHb":6.35},{"step":9,"t_start":1050,"t_end":1110,"duration_s":60,"t_mid":1080.0,"power_W":200.0,"HR_bpm":138.0,"Ve_mask":80.4,"Ve_llume":37.9,"Rf_mask":25.1,"Rf_llume":24.4,"Tv_mask":3.22,"Tv_llume":1.56,"VO2_mlkgmin":40.4,"VeVO2":19.7,"SmO2_start_pct":46.4,"SmO2_end_pct":44.8,"SmO2_slope_m1_startend":0.0268,"SmO2_slope_m2_last90s":0.0241,"SmO2_slope_m3_overall":0.0241,"O2Hb":5.52,"HHb":6.54},{"step":10,"t_start":1110,"t_end":1170,"duration_s":60,"t_mid":1140.0,"power_W":209.0,"HR_bpm":147.0,"Ve_mask":89.0,"Ve_llume":39.3,"Rf_mask":26.5,"Rf_llume":26.0,"Tv_mask":3.36,"Tv_llume":1.51,"VO2_mlkgmin":45.1,"VeVO2":19.6,"SmO2_start_pct":44.4,"SmO2_end_pct":45.1,"SmO2_slope_m1_startend":-0.0122,"SmO2_slope_m2_last90s":-0.0145,"SmO2_slope_m3_overall":-0.0145,"O2Hb":5.42,"HHb":6.64},{"step":11,"t_start":1170,"t_end":1230,"duration_s":60,"t_mid":1200.0,"power_W":217.0,"HR_bpm":150.0,"Ve_mask":94.0,"Ve_llume":40.7,"Rf_mask":28.7,"Rf_llume":27.9,"Tv_mask":3.28,"Tv_llume":1.46,"VO2_mlkgmin":44.8,"VeVO2":20.8,"SmO2_start_pct":45.5,"SmO2_end_pct":43.4,"SmO2_slope_m1_startend":0.035,"SmO2_slope_m2_last90s":0.0134,"SmO2_slope_m3_overall":0.0134,"O2Hb":5.22,"HHb":6.86}],"step_zones":[{"t0":40,"t1":330,"step":1},{"t0":340,"t1":570,"step":2},{"t0":580,"t1":750,"step":3},{"t0":760,"t1":820,"step":4},{"t0":820,"t1":870,"step":5},{"t0":870,"t1":930,"step":6},{"t0":930,"t1":990,"step":7},{"t0":990,"t1":1050,"step":8},{"t0":1050,"t1":1110,"step":9},{"t0":1110,"t1":1170,"step":10},{"t0":1170,"t1":1230,"step":11}],"auto_by_method_mask":{"m1":{"thresholds":{"VE/VO2":{"vt1":170.0,"vt2":213.0},"Ve (V-slope)":{"vt1":170.0,"vt2":200.0},"Rf":{"vt1":179.0,"vt2":209.0},"SmO2 slope":{"vt1":165.01477832512316,"vt2":188.0},"Oxy/de-oxy":{"vt1":174.0,"vt2":213.0}},"vt1_mean":171.60295566502464,"vt1_sd":4.669156258415198,"vt1_min":165.01477832512316,"vt1_max":179.0,"vt2_mean":204.6,"vt2_sd":9.562426470305537,"vt2_min":188.0,"vt2_max":213.0},"m2":{"thresholds":{"VE/VO2":{"vt1":170.0,"vt2":213.0},"Ve (V-slope)":{"vt1":170.0,"vt2":200.0},"Rf":{"vt1":179.0,"vt2":209.0},"SmO2 slope":{"vt1":170.7509627727856,"vt2":179.0},"Oxy/de-oxy":{"vt1":174.0,"vt2":213.0}},"vt1_mean":172.75019255455715,"vt1_sd":3.4567658193867485,"vt1_min":170.0,"vt1_max":179.0,"vt2_mean":202.8,"vt2_sd":12.812493902437573,"vt2_min":179.0,"vt2_max":213.0},"m3":{"thresholds":{"VE/VO2":{"vt1":170.0,"vt2":213.0},"Ve (V-slope)":{"vt1":170.0,"vt2":200.0},"Rf":{"vt1":179.0,"vt2":209.0},"SmO2 slope":{"vt1":170.7509627727856,"vt2":179.0},"Oxy/de-oxy":{"vt1":174.0,"vt2":213.0}},"vt1_mean":172.75019255455715,"vt1_sd":3.4567658193867485,"vt1_min":170.0,"vt1_max":179.0,"vt2_mean":202.8,"vt2_sd":12.812493902437573,"vt2_min":179.0,"vt2_max":213.0}},"auto_by_method_llume":{"m1":{"thresholds":{"VE/VO2":{"vt1":170.0,"vt2":213.0},"Ve (V-slope)":{"vt1":140.0,"vt2":170.0},"Rf":{"vt1":179.0,"vt2":200.0},"SmO2 slope":{"vt1":165.01477832512316,"vt2":188.0},"Oxy/de-oxy":{"vt1":174.0,"vt2":213.0}},"vt1_mean":165.60295566502464,"vt1_sd":13.60281177351923,"vt1_min":140.0,"vt1_max":179.0,"vt2_mean":196.8,"vt2_sd":16.314410807626487,"vt2_min":170.0,"vt2_max":213.0},"m2":{"thresholds":{"VE/VO2":{"vt1":170.0,"vt2":213.0},"Ve (V-slope)":{"vt1":140.0,"vt2":170.0},"Rf":{"vt1":179.0,"vt2":200.0},"SmO2 slope":{"vt1":170.7509627727856,"vt2":179.0},"Oxy/de-oxy":{"vt1":174.0,"vt2":213.0}},"vt1_mean":166.75019255455715,"vt1_sd":13.745964519987895,"vt1_min":140.0,"vt1_max":179.0,"vt2_mean":195.0,"vt2_sd":17.62952069683121,"vt2_min":170.0,"vt2_max":213.0},"m3":{"thresholds":{"VE/VO2":{"vt1":170.0,"vt2":213.0},"Ve (V-slope)":{"vt1":140.0,"vt2":170.0},"Rf":{"vt1":179.0,"vt2":200.0},"SmO2 slope":{"vt1":170.7509627727856,"vt2":179.0},"Oxy/de-oxy":{"vt1":174.0,"vt2":213.0}},"vt1_mean":166.75019255455715,"vt1_sd":13.745964519987895,"vt1_min":140.0,"vt1_max":179.0,"vt2_mean":195.0,"vt2_sd":17.62952069683121,"vt2_min":170.0,"vt2_max":213.0}},"default_method":"m3","has_llume":true};
+
+const INK='#1a1a1a', TEAL='#14815f', RED='#c94c3c', GREEN='#6aa84f';
+const VT1C='#2a5db0', VT2C='#c94c3c';
+const O2COL='#c94c3c', HHBCOL='#2a5db0';
+const LLUME_COL = '#c68128';
+const STORAGE_KEY = 'sn_step_thresholds_2026_04_17_v3';
+const METHODS = ['VE/VO2','Ve (V-slope)','Rf','SmO2 slope','Oxy/de-oxy'];
+
+const SLOPE_METHODS = {
+  'm1': {label:'start 10s vs end 10s', key:'SmO2_slope_m1_startend',
+         desc:'simple start-to-end comparison'},
+  'm2': {label:'last 90 s linreg', key:'SmO2_slope_m2_last90s',
+         desc:'captures the settled phase on long steps'},
+  'm3': {label:'whole-step linreg', key:'SmO2_slope_m3_overall',
+         desc:'least noisy, uses all samples in the step'}
+};
+
+const SOURCES = {
+  'mask':  {label:'VO2Master mask',    desc:'direct airflow measurement'},
+  'llume': {label:'Llume chest strap', desc:'chest strap, Ve/Tv saturate at high loads'}
+};
+
+let state = {
+  slope_method: DATA.default_method,
+  source: 'mask',
+  thresholds: {},
+  overrides: {}
+};
+
+(function seedState() {
+  const auto = getAuto().thresholds;
+  for (const m of METHODS) {
+    state.thresholds[m] = { vt1: auto[m].vt1, vt2: auto[m].vt2 };
+    state.overrides[m] = { vt1: false, vt2: false };
+  }
+})();
+
+function getAuto() {
+  const bucket = state.source === 'llume' ? DATA.auto_by_method_llume : DATA.auto_by_method_mask;
+  return bucket[state.slope_method];
+}
+
+function resetToAuto() {
+  const auto = getAuto().thresholds;
+  for (const m of METHODS) {
+    state.thresholds[m] = { vt1: auto[m].vt1, vt2: auto[m].vt2 };
+    state.overrides[m] = { vt1: false, vt2: false };
+  }
+}
+
+function safeLocalStorage() { try { return window.localStorage; } catch(e) { return null; } }
+
+function loadState() {
+  resetToAuto();
+  const ls = safeLocalStorage();
+  if (!ls) return;
+  try {
+    const s = ls.getItem(STORAGE_KEY); if (!s) return;
+    const parsed = JSON.parse(s);
+    if (parsed.slope_method && SLOPE_METHODS[parsed.slope_method]) state.slope_method = parsed.slope_method;
+    if (parsed.source && SOURCES[parsed.source]) state.source = parsed.source;
+    resetToAuto();
+    if (parsed.thresholds) {
+      for (const m of METHODS) {
+        if (parsed.thresholds[m] && parsed.overrides && parsed.overrides[m]) {
+          if (parsed.overrides[m].vt1) { state.thresholds[m].vt1 = parsed.thresholds[m].vt1; state.overrides[m].vt1 = true; }
+          if (parsed.overrides[m].vt2) { state.thresholds[m].vt2 = parsed.thresholds[m].vt2; state.overrides[m].vt2 = true; }
+        }
+      }
+    }
+  } catch(e) { console.warn('loadState failed', e); }
+}
+
+function saveState() {
+  const ls = safeLocalStorage(); if (!ls) return;
+  try {
+    ls.setItem(STORAGE_KEY, JSON.stringify({
+      slope_method: state.slope_method, source: state.source,
+      thresholds: state.thresholds, overrides: state.overrides, ts: new Date().toISOString()
+    }));
+  } catch(e) {}
+}
+
+function fmt_mmss(t) { const m=Math.floor(t/60), s=Math.round(t%60); return m+':'+String(s).padStart(2,'0'); }
+function clampPower(v) { return Math.max(60, Math.min(260, v)); }
+
+function setThreshold(method, which, value, userAction) {
+  state.thresholds[method][which] = clampPower(value);
+  if (userAction) { state.overrides[method][which] = true; saveState(); }
+  refreshAll();
+}
+
+function changeSlopeMethod(m) {
+  if (state.slope_method === m) return;
+  state.slope_method = m;
+  const newAuto = getAuto().thresholds;
+  for (const mm of METHODS) {
+    if (!state.overrides[mm].vt1) state.thresholds[mm].vt1 = newAuto[mm].vt1;
+    if (!state.overrides[mm].vt2) state.thresholds[mm].vt2 = newAuto[mm].vt2;
+  }
+  saveState();
+  updateSlopeChartData();
+  refreshAll();
+}
+
+function changeSource(src) {
+  if (state.source === src) return;
+  state.source = src;
+  const newAuto = getAuto().thresholds;
+  /* Only recompute Rf and Ve thresholds; others don't depend on source */
+  for (const mm of ['Ve (V-slope)', 'Rf']) {
+    if (!state.overrides[mm].vt1) state.thresholds[mm].vt1 = newAuto[mm].vt1;
+    if (!state.overrides[mm].vt2) state.thresholds[mm].vt2 = newAuto[mm].vt2;
+  }
+  saveState();
+  updateSourceSelection();
+  refreshAll();
+}
+
+function consensus() {
+  const v1 = METHODS.map(m => state.thresholds[m].vt1).filter(x => x != null);
+  const v2 = METHODS.map(m => state.thresholds[m].vt2).filter(x => x != null);
+  const mean = a => a.reduce((x,y)=>x+y,0)/a.length;
+  const sd = a => { const m = mean(a); return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length); };
+  return {
+    vt1: { mean: mean(v1), sd: sd(v1), min: Math.min(...v1), max: Math.max(...v1) },
+    vt2: { mean: mean(v2), sd: sd(v2), min: Math.min(...v2), max: Math.max(...v2) }
+  };
+}
+
+function renderConsensus() {
+  const c = consensus();
+  document.getElementById('vt1Big').textContent = Math.round(c.vt1.mean) + ' W';
+  document.getElementById('vt1CI').textContent  = '±' + c.vt1.sd.toFixed(1) + ' W  (range ' + Math.round(c.vt1.min) + '–' + Math.round(c.vt1.max) + ' W)';
+  document.getElementById('vt2Big').textContent = Math.round(c.vt2.mean) + ' W';
+  document.getElementById('vt2CI').textContent  = '±' + c.vt2.sd.toFixed(1) + ' W  (range ' + Math.round(c.vt2.min) + '–' + Math.round(c.vt2.max) + ' W)';
+}
+
+function renderThresholdTable() {
+  const tb = document.getElementById('thresholdBody');
+  const NOTES = {
+    'VE/VO2':'minimum of U-shape; steepest post-min rise',
+    'Ve (V-slope)':'piecewise linear breakpoints  ('+SOURCES[state.source].label+')',
+    'Rf':'piecewise linear breakpoints  ('+SOURCES[state.source].label+')',
+    'SmO2 slope':'slope > +0.005 %/s; slope peak  ('+SLOPE_METHODS[state.slope_method].label+')',
+    'Oxy/de-oxy':'O2Hb/HHb crossover; steepest divergence'
+  };
+  tb.innerHTML = METHODS.map(m => {
+    const t = state.thresholds[m]; const ov = state.overrides[m];
+    const v1 = t.vt1 != null ? Math.round(t.vt1) + (ov.vt1?'<span class="edit-badge">edited</span>':'') : '—';
+    const v2 = t.vt2 != null ? Math.round(t.vt2) + (ov.vt2?'<span class="edit-badge">edited</span>':'') : '—';
+    return `<tr><td style="text-align:left;font-weight:500;">${m}</td><td>${v1}</td><td>${v2}</td>
+            <td style="text-align:left;color:var(--muted);font-size:11.5px;">${NOTES[m]}</td></tr>`;
+  }).join('');
+}
+
+function renderMiniTable() {
+  const mb = document.getElementById('miniBody');
+  const slopeKey = SLOPE_METHODS[state.slope_method].key;
+  const veK = state.source === 'llume' ? 'Ve_llume' : 'Ve_mask';
+  const rfK = state.source === 'llume' ? 'Rf_llume' : 'Rf_mask';
+  const tvK = state.source === 'llume' ? 'Tv_llume' : 'Tv_mask';
+  mb.innerHTML = DATA.steps.map(r => {
+    const ve = r[veK] != null ? r[veK] : '—';
+    const rf = r[rfK] != null ? r[rfK] : '—';
+    const tv = r[tvK] != null ? r[tvK].toFixed(2) : '—';
+    return `<tr><td>${r.step}</td><td><b>${r.power_W}</b></td>
+      <td>${r.VeVO2}</td><td>${ve}</td><td>${rf}</td><td>${tv}</td>
+      <td>${r[slopeKey].toFixed(3)}</td>
+      <td>${r.O2Hb.toFixed(2)}</td><td>${r.HHb.toFixed(2)}</td></tr>`;
+  }).join('');
+}
+
+function updateSlopeChartData() {
+  const slopeKey = SLOPE_METHODS[state.slope_method].key;
+  if (smo2SlopeChart) {
+    smo2SlopeChart.data.datasets[0].data = DATA.steps.map(r => ({x: r.power_W, y: r[slopeKey]}));
+    smo2SlopeChart.update('none');
+  }
+  document.getElementById('slopeMethodLabel').textContent = SLOPE_METHODS[state.slope_method].label;
+  document.getElementById('methodDesc').textContent = SLOPE_METHODS[state.slope_method].desc;
+  document.querySelectorAll('[data-method]').forEach(b =>
+    b.classList.toggle('active', b.dataset.method === state.slope_method));
+}
+
+function updateSourceSelection() {
+  /* Update Rf and Ve charts to use new source */
+  const veK = state.source === 'llume' ? 'Ve_llume' : 'Ve_mask';
+  const rfK = state.source === 'llume' ? 'Rf_llume' : 'Rf_mask';
+  if (veChart) {
+    veChart.data.datasets[0].data = DATA.steps.map(r => ({x: r.power_W, y: r[veK]}));
+    veChart.data.datasets[0].borderColor = state.source === 'llume' ? LLUME_COL : TEAL;
+    veChart.data.datasets[0].backgroundColor = state.source === 'llume' ? LLUME_COL : TEAL;
+    veChart.update('none');
+  }
+  if (rfChart) {
+    rfChart.data.datasets[0].data = DATA.steps.map(r => ({x: r.power_W, y: r[rfK]}));
+    rfChart.data.datasets[0].borderColor = state.source === 'llume' ? LLUME_COL : GREEN;
+    rfChart.data.datasets[0].backgroundColor = state.source === 'llume' ? LLUME_COL : GREEN;
+    rfChart.update('none');
+  }
+  document.querySelectorAll('[data-source]').forEach(b =>
+    b.classList.toggle('active', b.dataset.source === state.source));
+  document.getElementById('srcDesc').textContent = SOURCES[state.source].desc;
+  const srcLabel = '(' + SOURCES[state.source].label + ')';
+  document.getElementById('ve_src').textContent = srcLabel;
+  document.getElementById('rf_src').textContent = srcLabel;
+  document.getElementById('mini_src').textContent = srcLabel;
+  document.getElementById('llumeWarn').style.display = state.source === 'llume' ? 'block' : 'none';
+}
+
+function updateEditStatus() {
+  const n = METHODS.reduce((a,m) => a + (state.overrides[m].vt1?1:0) + (state.overrides[m].vt2?1:0), 0);
+  document.getElementById('editStatus').textContent = n === 0 ? '' : (n + ' manual edit' + (n>1?'s':'') + ' saved');
+}
+
+function refreshAll() {
+  charts.forEach(c => c.update('none'));
+  renderConsensus(); renderThresholdTable(); renderMiniTable(); updateEditStatus();
+}
+
+const charts = [];
+let smo2SlopeChart = null;
+let veChart = null;
+let rfChart = null;
+
+function vtLinesPlugin(method) {
+  return {
+    id: 'vtLines_' + method.replace(/[^\w]/g,'_'),
+    afterDatasetsDraw(chart) {
+      const {ctx, chartArea, scales} = chart;
+      ctx.save();
+      const t = state.thresholds[method];
+      [['vt1',VT1C,'VT1'],['vt2',VT2C,'VT2']].forEach(([which,color,label]) => {
+        const x = t[which]; if (x == null) return;
+        const px = scales.x.getPixelForValue(x);
+        if (px < chartArea.left || px > chartArea.right) return;
+        ctx.strokeStyle = color; ctx.lineWidth = 1.8; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(px, chartArea.top); ctx.lineTo(px, chartArea.bottom); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = color + '22';
+        ctx.fillRect(px-6, chartArea.top, 12, chartArea.bottom - chartArea.top);
+        ctx.fillStyle = color;
+        ctx.font = '500 10.5px -apple-system,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(label + ' ' + Math.round(x) + 'W', px, chartArea.top + 11);
+        ctx.beginPath(); ctx.arc(px, (chartArea.top+chartArea.bottom)/2, 4, 0, Math.PI*2); ctx.fill();
+      });
+      ctx.restore();
+    }
+  };
+}
+
+function attachLineDrag(chart, method) {
+  const canvas = chart.canvas; let drag = null;
+  function xy(e) { const r = canvas.getBoundingClientRect(); const p = e.touches?e.touches[0]:e; return {x: p.clientX-r.left, y: p.clientY-r.top}; }
+  function hit(x) {
+    const t = state.thresholds[method];
+    for (const which of ['vt1','vt2']) {
+      const v = t[which]; if (v == null) continue;
+      if (Math.abs(x - chart.scales.x.getPixelForValue(v)) < 8) return which;
+    }
+    return null;
+  }
+  canvas.addEventListener('mousemove', e => {
+    const {x} = xy(e);
+    if (drag) { e.preventDefault(); setThreshold(method, drag, chart.scales.x.getValueForPixel(x), true); }
+    else canvas.style.cursor = hit(x) ? 'ew-resize' : 'default';
+  });
+  canvas.addEventListener('mousedown', e => { const h = hit(xy(e).x); if (h) { drag = h; e.preventDefault(); } });
+  window.addEventListener('mouseup', () => { drag = null; canvas.style.cursor = 'default'; });
+  canvas.addEventListener('touchstart', e => { const h = hit(xy(e).x); if (h) { drag = h; e.preventDefault(); } }, {passive:false});
+  canvas.addEventListener('touchmove',  e => { if (drag) { e.preventDefault(); setThreshold(method, drag, chart.scales.x.getValueForPixel(xy(e).x), true); } }, {passive:false});
+  canvas.addEventListener('touchend', () => { drag = null; });
+}
+
+/* Timeline chart */
+const tl = DATA.timeline;
+const stepZonesPlugin = { id:'stepZones', beforeDatasetsDraw(chart) {
+  const {ctx, chartArea, scales} = chart; ctx.save();
+  DATA.step_zones.forEach(z => {
+    const x0 = scales.x.getPixelForValue(z.t0);
+    const x1 = scales.x.getPixelForValue(z.t1);
+    ctx.fillStyle = 'rgba(182,217,76,0.18)';
+    ctx.fillRect(x0, chartArea.top, x1-x0, chartArea.bottom-chartArea.top);
+    ctx.fillStyle = '#658f1d'; ctx.font = '500 10px -apple-system,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('S'+z.step, (x0+x1)/2, chartArea.top+11);
+  });
+  ctx.restore();
+}};
+
+charts.push(new Chart(document.getElementById('tlChart'), {
+  type:'line',
+  data: { labels: tl.t, datasets: [
+    { label:'Power', data: tl.power, yAxisID:'y1', borderColor: INK,  borderWidth: 1.6, pointRadius: 0, tension: 0.1, spanGaps: true },
+    { label:'HR',    data: tl.hr,    yAxisID:'y2', borderColor: RED,  borderWidth: 1.6, pointRadius: 0, tension: 0.2, spanGaps: true },
+    { label:'VO2',   data: tl.vo2,   yAxisID:'y2', borderColor: TEAL, borderWidth: 1.6, pointRadius: 0, tension: 0.2, spanGaps: true }
+  ]},
+  options: {
+    responsive:true, maintainAspectRatio:false, animation:false,
+    interaction:{mode:'index', intersect:false},
+    plugins: { legend:{display:false},
+      tooltip: { callbacks: { title:(it)=>'t = '+fmt_mmss(Number(it[0].label)) } } },
+    scales: {
+      x: { title:{display:true,text:'Time (mm:ss)'}, ticks:{ maxTicksLimit:14, callback:(v,i)=>{ const t=tl.t[i]; return t%120===0?fmt_mmss(t):''; } } },
+      y1:{ position:'left',  title:{display:true,text:'Power (W)'}, min:0, max:280 },
+      y2:{ position:'right', title:{display:true,text:'HR / VO2'},  min:0, max:160, grid:{display:false} }
+    }
+  }, plugins: [stepZonesPlugin]
+}));
+
+/* Forest */
+const forestChart = new Chart(document.getElementById('forestChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      { label:'VT1', backgroundColor: VT1C, borderColor: VT1C, pointRadius: 7, pointHoverRadius: 9, pointStyle: 'circle',
+        data: METHODS.map((m,i) => ({ x: state.thresholds[m].vt1, y: METHODS.length - i })) },
+      { label:'VT2', backgroundColor: VT2C, borderColor: VT2C, pointRadius: 7, pointHoverRadius: 9, pointStyle: 'triangle',
+        data: METHODS.map((m,i) => ({ x: state.thresholds[m].vt2, y: METHODS.length - i })) }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false, animation:false,
+    plugins: { legend: { display:true, position:'top', labels:{boxWidth:10, font:{size:12}, padding:8} },
+      tooltip: { callbacks: {
+        title:(it)=> METHODS[METHODS.length - Math.round(it[0].parsed.y)],
+        label:(it)=> it.dataset.label + ' = ' + Math.round(it.parsed.x) + ' W'
+      }}
+    },
+    scales: {
+      x: { title:{display:true,text:'Power (W)'}, min:130, max:230 },
+      y: { title:{display:false}, min:0.5, max: METHODS.length+0.5,
+           ticks: { stepSize:1, callback:(v)=>METHODS[METHODS.length-v]||'', font:{size:11} },
+           grid: { color:'rgba(0,0,0,0.05)' } }
+    }
+  },
+  plugins: [{
+    id:'forestConsensus',
+    beforeDatasetsDraw(chart) {
+      const c = consensus();
+      const {ctx, chartArea, scales} = chart; ctx.save();
+      [[c.vt1, VT1C, 'rgba(42,93,176,0.09)'], [c.vt2, VT2C, 'rgba(201,76,60,0.08)']].forEach(([cc, line, band]) => {
+        const xa = scales.x.getPixelForValue(cc.min);
+        const xb = scales.x.getPixelForValue(cc.max);
+        ctx.fillStyle = band; ctx.fillRect(xa, chartArea.top, xb-xa, chartArea.bottom-chartArea.top);
+        const xm = scales.x.getPixelForValue(cc.mean);
+        ctx.strokeStyle = line; ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+        ctx.beginPath(); ctx.moveTo(xm, chartArea.top); ctx.lineTo(xm, chartArea.bottom); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+      ctx.restore();
+    }
+  },{
+    id:'forestRefresh',
+    beforeUpdate(chart) {
+      chart.data.datasets[0].data = METHODS.map((m,i) => ({ x: state.thresholds[m].vt1, y: METHODS.length - i }));
+      chart.data.datasets[1].data = METHODS.map((m,i) => ({ x: state.thresholds[m].vt2, y: METHODS.length - i }));
+    }
+  }]
+});
+charts.push(forestChart);
+
+/* Forest drag */
+(function attachForestDrag() {
+  const canvas = forestChart.canvas; let drag = null;
+  function xy(e) { const r = canvas.getBoundingClientRect(); const p = e.touches?e.touches[0]:e; return {x: p.clientX-r.left, y: p.clientY-r.top}; }
+  function hit(x, y) {
+    for (let i = 0; i < METHODS.length; i++) {
+      const method = METHODS[i];
+      for (const which of ['vt1','vt2']) {
+        const v = state.thresholds[method][which]; if (v == null) continue;
+        const px = forestChart.scales.x.getPixelForValue(v);
+        const py = forestChart.scales.y.getPixelForValue(METHODS.length - i);
+        if (Math.hypot(x-px, y-py) < 10) return {method, which};
+      }
+    }
+    return null;
+  }
+  canvas.addEventListener('mousemove', e => {
+    const p = xy(e);
+    if (drag) { e.preventDefault(); setThreshold(drag.method, drag.which, forestChart.scales.x.getValueForPixel(p.x), true); }
+    else canvas.style.cursor = hit(p.x, p.y) ? 'ew-resize' : 'default';
+  });
+  canvas.addEventListener('mousedown', e => { const p = xy(e); const h = hit(p.x, p.y); if (h) { drag = h; e.preventDefault(); } });
+  window.addEventListener('mouseup', () => { drag = null; canvas.style.cursor = 'default'; });
+  canvas.addEventListener('touchstart', e => { const p = xy(e); const h = hit(p.x, p.y); if (h) { drag = h; e.preventDefault(); } }, {passive:false});
+  canvas.addEventListener('touchmove',  e => { if (drag) { e.preventDefault(); const p = xy(e); setThreshold(drag.method, drag.which, forestChart.scales.x.getValueForPixel(p.x), true); } }, {passive:false});
+  canvas.addEventListener('touchend', () => { drag = null; });
+})();
+
+function stepXY(key) { return DATA.steps.map(r => ({x: r.power_W, y: r[key]})); }
+
+function makeMarkerChart(id, method, key, yLabel, color, fmt, extraDatasets) {
+  const datasets = [{
+    label: yLabel, data: stepXY(key),
+    borderColor: color, backgroundColor: color, borderWidth: 2, pointRadius: 4,
+    pointBackgroundColor: '#fff', pointBorderWidth: 2, tension: 0.15
+  }];
+  if (extraDatasets) extraDatasets.forEach(ds => datasets.push(ds));
+  const chart = new Chart(document.getElementById(id), {
+    type: 'line', data: { datasets },
+    options: {
+      responsive:true, maintainAspectRatio:false, animation:false,
+      plugins: {
+        legend: { display: !!extraDatasets, position:'bottom', labels: { boxWidth:10, font:{size:11}, padding:8 } },
+        tooltip: { callbacks: {
+          title: (it)=>'Step '+DATA.steps[it[0].dataIndex].step+'  @ '+it[0].parsed.x+' W',
+          label: (it)=> (it.dataset.label || yLabel) + ': ' + (fmt?fmt(it.parsed.y):it.parsed.y)
+        }}
+      },
+      scales: {
+        x: { type:'linear', title:{display:true,text:'Power (W)'}, min:90, max:230 },
+        y: { title:{display:true, text: yLabel} }
+      }
+    },
+    plugins: [vtLinesPlugin(method)]
+  });
+  attachLineDrag(chart, method);
+  charts.push(chart);
+  return chart;
+}
+
+makeMarkerChart('c_vevo2','VE/VO2','VeVO2','VE/VO2','#b6741c');
+veChart = makeMarkerChart('c_ve','Ve (V-slope)','Ve_mask','Ve (L/min)',TEAL);
+rfChart = makeMarkerChart('c_rf','Rf','Rf_mask','Rf (bpm)',GREEN);
+smo2SlopeChart = makeMarkerChart('c_smo2slope','SmO2 slope',
+  SLOPE_METHODS[state.slope_method].key, 'SmO2 slope (%/s)', '#7a3b9e', v=>v.toFixed(4));
+const oxyChart = makeMarkerChart('c_oxy','Oxy/de-oxy','O2Hb','Hb (Moxy units)',O2COL, v=>v.toFixed(2), [{
+  label:'HHb', data: DATA.steps.map(r => ({x: r.power_W, y: r.HHb})),
+  borderColor: HHBCOL, backgroundColor: HHBCOL, borderWidth: 2, pointRadius: 4,
+  pointBackgroundColor: '#fff', pointBorderWidth: 2, tension: 0.15
+}]);
+oxyChart.data.datasets[0].label = 'O2Hb';
+oxyChart.update('none');
+
+/* Comparison charts: mask vs Llume on dual independent axes.
+   Each y axis auto-fits to its own series's min/max so shapes can be compared
+   directly regardless of magnitude difference (important since Llume Ve saturates). */
+function pad(min, max) {
+  const r = max - min; const p = r * 0.12;
+  return { lo: min - p, hi: max + p };
+}
+function seriesRange(key) {
+  const v = DATA.steps.map(r => r[key]).filter(x => x != null);
+  return pad(Math.min(...v), Math.max(...v));
+}
+function makeCmpChart(id, maskKey, llumeKey, label, fmt) {
+  const mRange = seriesRange(maskKey);
+  const lRange = seriesRange(llumeKey);
+  const chart = new Chart(document.getElementById(id), {
+    type:'line',
+    data:{ datasets: [
+      { label: 'Mask ('+label+')',  data: stepXY(maskKey), yAxisID: 'yMask',
+        borderColor: TEAL, backgroundColor: TEAL, borderWidth:2, pointRadius:4,
+        pointBackgroundColor:'#fff', pointBorderWidth:2, tension:0.15 },
+      { label: 'Llume ('+label+')', data: stepXY(llumeKey), yAxisID: 'yLlume',
+        borderColor: LLUME_COL, backgroundColor: LLUME_COL, borderWidth:2, borderDash:[4,3],
+        pointRadius:4, pointStyle:'rect', pointBackgroundColor:'#fff', pointBorderWidth:2, tension:0.15 }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:false,
+      interaction:{mode:'index', intersect:false},
+      plugins:{ legend:{display:true, position:'bottom', labels:{boxWidth:10, font:{size:11}, padding:8}},
+        tooltip:{callbacks:{
+          title:(it)=>'Step '+DATA.steps[it[0].dataIndex].step+' @ '+it[0].parsed.x+'W',
+          label:(it)=> it.dataset.label+': '+(fmt?fmt(it.parsed.y):it.parsed.y)
+        }}
+      },
+      scales:{
+        x:{ type:'linear', title:{display:true,text:'Power (W)'}, min:90, max:230 },
+        yMask:{ type:'linear', position:'left',
+                title:{display:true,text:'Mask ('+label+')', color: TEAL},
+                min: mRange.lo, max: mRange.hi,
+                ticks:{color: TEAL},
+                grid:{color:'rgba(20,129,95,0.08)'} },
+        yLlume:{ type:'linear', position:'right',
+                 title:{display:true,text:'Llume ('+label+')', color: LLUME_COL},
+                 min: lRange.lo, max: lRange.hi,
+                 ticks:{color: LLUME_COL},
+                 grid:{display:false} }
+      }
+    }
+  });
+  charts.push(chart); return chart;
+}
+makeCmpChart('c_cmp_rf', 'Rf_mask', 'Rf_llume', 'bpm');
+makeCmpChart('c_cmp_ve', 'Ve_mask', 'Ve_llume', 'L/min');
+makeCmpChart('c_cmp_tv', 'Tv_mask', 'Tv_llume', 'L', v => v.toFixed(2));
+
+/* Wire pickers */
+document.querySelectorAll('[data-method]').forEach(b => b.addEventListener('click', () => changeSlopeMethod(b.dataset.method)));
+document.querySelectorAll('[data-source]').forEach(b => b.addEventListener('click', () => changeSource(b.dataset.source)));
+document.getElementById('btnReset').addEventListener('click', () => {
+  if (confirm('Reset all VT lines to auto-detected values for the current settings?')) {
+    resetToAuto(); saveState(); refreshAll();
+  }
+});
+document.getElementById('btnCopy').addEventListener('click', () => {
+  const c = consensus();
+  const payload = {
+    session:'2026-04-17 1-min step test',
+    source: SOURCES[state.source].label,
+    slope_method: SLOPE_METHODS[state.slope_method].label,
+    vt1_consensus_W: Math.round(c.vt1.mean),
+    vt2_consensus_W: Math.round(c.vt2.mean),
+    by_method: state.thresholds,
+    overridden: state.overrides
+  };
+  const txt = JSON.stringify(payload, null, 2);
+  navigator.clipboard.writeText(txt).then(
+    () => { document.getElementById('btnCopy').textContent = 'Copied ✓'; setTimeout(()=>{ document.getElementById('btnCopy').textContent = 'Copy values'; }, 1500); },
+    () => { prompt('Copy this:', txt); }
+  );
+});
+
+/* ===== Column charts: mask vs Llume against power (one bar per step) ===== */
+(function buildColumnCharts() {
+  const stepLabels = DATA.steps.map(r => 'S' + r.step + '\n' + Math.round(r.power_W) + 'W');
+  const TEAL_C = '#14815f';
+  const LLUME_C = '#c68128';
+
+  function makeDataLabelsPlugin(id, fmt, colorByDataset) {
+    return {
+      id: 'colLabels_' + id,
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        ctx.save();
+        ctx.font = '500 9.5px -apple-system,BlinkMacSystemFont,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        chart.data.datasets.forEach((ds, dsIdx) => {
+          const meta = chart.getDatasetMeta(dsIdx);
+          meta.data.forEach((bar, i) => {
+            const v = ds.data[i];
+            if (v == null) return;
+            ctx.fillStyle = colorByDataset ? ds.backgroundColor : '#333';
+            ctx.fillText(fmt ? fmt(v) : String(Math.round(v)), bar.x, bar.y - 3);
+          });
+        });
+        ctx.restore();
+      }
+    };
+  }
+
+  function pad(arr) {
+    const lo = Math.min(...arr), hi = Math.max(...arr);
+    const p = (hi - lo) * 0.20;
+    return { lo: Math.max(0, lo - p), hi: hi + p };
+  }
+
+  function makeGroupChart(canvasId, maskKey, llumeKey, yLabel, fmt, dualAxis) {
+    const maskData = DATA.steps.map(r => r[maskKey]);
+    const llumeData = DATA.steps.map(r => r[llumeKey]);
+    const datasets = [
+      { label: 'Mask',  data: maskData,  backgroundColor: TEAL_C,
+        borderWidth: 0, barPercentage: 0.9, categoryPercentage: 0.85,
+        yAxisID: dualAxis ? 'yMask' : 'y' },
+      { label: 'Llume', data: llumeData, backgroundColor: LLUME_C,
+        borderWidth: 0, barPercentage: 0.9, categoryPercentage: 0.85,
+        yAxisID: dualAxis ? 'yLlume' : 'y' }
+    ];
+    let scales;
+    if (dualAxis) {
+      const mR = pad(maskData), lR = pad(llumeData);
+      scales = {
+        x: { grid:{display:false}, ticks:{font:{size:9.5}} },
+        yMask:  { position:'left',  title:{display:true, text:'Mask ('+yLabel+')', color: TEAL_C},
+                  min: mR.lo, max: mR.hi, ticks:{color: TEAL_C},
+                  grid:{color:'rgba(20,129,95,0.08)'} },
+        yLlume: { position:'right', title:{display:true, text:'Llume ('+yLabel+')', color: LLUME_C},
+                  min: lR.lo, max: lR.hi, ticks:{color: LLUME_C},
+                  grid:{display:false} }
+      };
+    } else {
+      const all = [...maskData, ...llumeData];
+      const r = pad(all);
+      scales = {
+        x: { grid:{display:false}, ticks:{font:{size:9.5}} },
+        y: { title:{display:true, text:yLabel}, min: r.lo, max: r.hi,
+             grid:{color:'rgba(0,0,0,0.05)'} }
+      };
+    }
+    new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: { labels: stepLabels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        layout: { padding: { top: 14 } },
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { boxWidth:10, font:{size:11}, padding:8 } },
+          tooltip: { callbacks: {
+            title: (it) => 'Step ' + DATA.steps[it[0].dataIndex].step + '  @ ' + Math.round(DATA.steps[it[0].dataIndex].power_W) + 'W',
+            label: (it) => it.dataset.label + ': ' + (fmt ? fmt(it.parsed.y) : it.parsed.y)
+          }}
+        },
+        scales
+      },
+      plugins: [makeDataLabelsPlugin(canvasId, fmt, true)]
+    });
+  }
+
+  makeGroupChart('colRf', 'Rf_mask', 'Rf_llume', 'bpm',   v => v.toFixed(1), false);
+  makeGroupChart('colVe', 'Ve_mask', 'Ve_llume', 'L/min', v => v.toFixed(1), true);
+  makeGroupChart('colTv', 'Tv_mask', 'Tv_llume', 'L',     v => v.toFixed(2), true);
+
+  /* Tv / 3.2 as % of reference — single series, red band between 75-85% */
+  (function(){
+    const pctData = DATA.steps.map(r => (r.Tv_mask / 3.2) * 100);
+    const lo = Math.min(...pctData), hi = Math.max(...pctData);
+    const padHi = (hi - 75) * 0.10;
+    new Chart(document.getElementById('colTvPct'), {
+      type: 'bar',
+      data: {
+        labels: stepLabels,
+        datasets: [{
+          label: 'Tv mask / 3.2 (%)',
+          data: pctData, backgroundColor: TEAL_C,
+          borderWidth: 0, barPercentage: 0.7, categoryPercentage: 0.85
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        layout: { padding: { top: 14 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: {
+            title: (it) => 'Step ' + DATA.steps[it[0].dataIndex].step + '  @ ' + Math.round(DATA.steps[it[0].dataIndex].power_W) + 'W',
+            label: (it) => 'Tv / 3.2 = ' + it.parsed.y.toFixed(1) + '%  (' + (it.parsed.y/100*3.2).toFixed(2) + ' L)'
+          }}
+        },
+        scales: {
+          x: { grid:{display:false}, ticks:{font:{size:9.5}} },
+          y: { title:{display:true, text:'Tv mask / 3.2  (%)'},
+               min: 75, max: Math.ceil(hi + padHi),
+               grid:{color:'rgba(0,0,0,0.05)'},
+               ticks:{ callback: (v) => v + '%' } }
+        }
+      },
+      plugins: [{
+        id: 'colTvPctRedBand',
+        beforeDatasetsDraw(chart) {
+          const { ctx, chartArea, scales } = chart;
+          const y75 = scales.y.getPixelForValue(75);
+          const y85 = scales.y.getPixelForValue(85);
+          ctx.save();
+          ctx.fillStyle = 'rgba(201,76,60,0.15)';
+          ctx.fillRect(chartArea.left, y85, chartArea.right - chartArea.left, y75 - y85);
+          ctx.fillStyle = '#8a2b22';
+          ctx.font = '500 10px -apple-system,sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText('75-85% band', chartArea.left + 5, y85 + 12);
+          ctx.restore();
+        }
+      }, {
+        id: 'colTvPct100Baseline',
+        beforeDatasetsDraw(chart) {
+          const { ctx, chartArea, scales } = chart;
+          const y100 = scales.y.getPixelForValue(100);
+          if (y100 < chartArea.top || y100 > chartArea.bottom) return;
+          ctx.save();
+          ctx.strokeStyle = 'rgba(198,129,40,0.7)';
+          ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+          ctx.beginPath(); ctx.moveTo(chartArea.left, y100); ctx.lineTo(chartArea.right, y100); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#8a5910';
+          ctx.font = '500 10px -apple-system,sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText('100% = 3.2 L reference', chartArea.right - 5, y100 - 4);
+          ctx.restore();
+        }
+      }, {
+        id: 'colTvPctLabels',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          ctx.save();
+          ctx.font = '500 9.5px -apple-system,BlinkMacSystemFont,sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          const ds = chart.data.datasets[0];
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((bar, i) => {
+            const v = ds.data[i]; if (v == null) return;
+            ctx.fillStyle = TEAL_C;
+            ctx.fillText(v.toFixed(1) + '%', bar.x, bar.y - 3);
+          });
+          ctx.restore();
+        }
+      }]
+    });
+  })();
+})();
+
+/* Initial render */
+try {
+  loadState();
+  updateSlopeChartData();
+  updateSourceSelection();
+  refreshAll();
+} catch(e) {
+  console.error('Init failed:', e);
+  document.body.insertAdjacentHTML('afterbegin',
+    '<div style="padding:20px;background:#fee;border:1px solid #c00;margin:20px;border-radius:6px;">'+
+    '<b>Error initialising report:</b> ' + (e && e.message ? e.message : e) + '</div>');
+}
+</script>
+
+
+</body></html>
